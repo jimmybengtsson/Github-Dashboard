@@ -1,0 +1,11 @@
+{
+  "name": "firebase-gateway",
+  "version": "1.0.0",
+  "description": "Gateway to connect all API's etc for notification hub",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jimmybengtsson",
+  "license": "ISC"
+}
