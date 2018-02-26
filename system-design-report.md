@@ -1,4 +1,4 @@
-### System Design Report
+# System Design Report
 
 **Jimmy Bengtsson - jb223pu - 1dv612 - Web Application Architectures and Frameworks**
 
@@ -35,24 +35,24 @@ React also includes some great developer tools that can be installed as Chrome-e
 
 ### 2.2 Server
 
-The server will be deployed and running on Firebase Cloud Functions. Functions as a Service (FaaS) as Firebase Functions are small server containers that handles acting automatically which which makes it ideal to host an API without having the knowledge of load balancing and only has to pay for the actual times the server is being used.
+The server will be deployed and running on Firebase Cloud Functions. Functions as a Service (FaaS) as Firebase Functions are small server containers that handles scaling automatically which makes it ideal to host an API without having the knowledge of load balancing and only has to pay for the actual times the server is being used.
 
 The server-application will be based on Express instead of only running different functions on the cloud-service. By adding Express, middleware’s can be added and used with ease in the application. 
 
 
 **Risks:**
 
-  * Applications deployed to FaaS are often put to sleep when there not being used. It can take up to 10 seconds before it starts running again. How will webhooks from Github be handled when a new event occur?
+  * Applications deployed to FaaS are often put to sleep when they're not being used. It can take up to 10 seconds before it starts running again. How will webhooks from Github be handled when a new event occur?
   
-![System overview](./wiki-img/system-overview.png)
+![System overview](https://github.com/1dv612/jb223pu-examination/raw/master/wiki-img/system-overview.png)
 
 ## 3. Database design
 
-For all database-handling in the application will be handled withe Firebase Database-service.
+All database-handling in the application will be handled with Firebase Database-service.
 
-A User can be created with with entities like, id, username, password hashed with bcrypt and more. Settings for Github-teams will be saved as false and true. So if a user is signing in to Github through the application, a token that is hashed with crypt is saved. He can then select which commits and releases who will be reported in the application. Settings for each team and repo is saved as false by default.
+A User can be created with entities like, id, username, password hashed with bcrypt and more. Settings for Github-teams will be saved as false and true. So if a user is signing in to Github through the application, a token that is hashed with Bcrypt is saved. He can then select which commits and releases that will be reported in the application. Settings for each team and repo is saved as false by default.
 
-![Database](./wiki-img/database.png)
+![Database](https://github.com/1dv612/jb223pu-examination/raw/master/wiki-img/database.png)
 
 ## 4. User Interface
 
@@ -60,22 +60,23 @@ Despite the large options available for creating components and more with React,
 
 **Dashboard**
 
-![Dashboard](./wiki-img/web-mockup.png)
+![Dashboard](https://github.com/1dv612/jb223pu-examination/raw/master/wiki-img/web-mockup.png)
 
 
 **Github**
 
-![Github](./wiki-img/web-mockup-github.png)
+![Github](https://github.com/1dv612/jb223pu-examination/raw/master/wiki-img/web-mockup-github.png)
 
 
 **Settings**
 
-![Settings](./wiki-img/web-mockup-settings-github.png)
+![Settings](https://github.com/1dv612/jb223pu-examination/raw/master/wiki-img/web-mockup-settings-github.png)
+
 
 
 For each service the user is adding a new link will be added in menu.
 
-![Add menu](./wiki-img/add-webhook.png)
+![Add menu](https://github.com/1dv612/jb223pu-examination/raw/master/wiki-img/add-webhook.png)
 
 
 ## 5. Detailed design
@@ -83,15 +84,49 @@ For each service the user is adding a new link will be added in menu.
 
 ### 5.1 Client
 
-![Client](./wiki-img/client.png)
+![Client](https://github.com/1dv612/jb223pu-examination/raw/master/wiki-img/client.png)
+
+  * **App -** When a user enters the application it will check if a token is tored in the local storage. If it isn't the user will be redirected to the sign in page. If local storage contains a token it will be validated with the server and the user will be redirected to either the dashboard or sign in page based on validity of token. The App's state will be updated to signedIn.
+  
+  * **LoginView -** Users input will be compared with servers data. If correct a autho-token will be assigned and saved in local storage and the user will be redirected to dashboard.
+  
+  * **RegisterView -** Users input will be saved as a user-object and sent to server. A autho-token will be assigned and saved in local storage and the user will be redirected to settings.
+  
+  * **JWTAuth -** Is acting as a middleman between client and server where all requests who requires authorization is being handled.
+  
+  * **User -** Creates a new user to be sent to the server. Will also update users settings.
+  
+  * **DashboardView -** Start page of the application if the App's state is signedIn. Representing a summary with data from all services the user has signed in to and set to show in settings.
+  
+  * **SettingsView -** Start page if App's state is signedIn but the user has not signed in to any service or set any data to show.
+  
+  * **WebhookView -** Will render if the App's state is signedIn and pageNavigation is set to Webhook. A component for each service signed in to will be rendered where information from actual service will be shown.
 
 ### 5.2 Server
 
-![Server](./wiki-img/server.png)
+![Server](https://github.com/1dv612/jb223pu-examination/raw/master/wiki-img/server.png)
+
+  * **App -** Will initiate Express server and add middlewares.
+
+  * **Routes -** Will handle and forward all incoming requests to the controllers.
+  
+  * **Autho -** Will handle all authentication such as create, delete or update an user.
+  
+  * **Notifications -** Will handle sending of notifications when a webhook is received.
+  
+  * **Webhooks -** Used to initiate webhooks and forward incoming hooks to notifications.
+  
+  * **Settings -** Changed settings for webhhooks and notifications is updated in the database.
+  
+  * **UserDB -** Initiates a User-schema and handles connections to Firebase Database.
+  
+  * **JWT -** Creates and validates tokens used for authorization.
 
 ### 5.3 Webhooks
 
 When a user is signing in to Github through the application, a connection between Github and the application will be established and kept open to deliver new events occurring on Github.
+
+**Extra:** Adding webhooks to other services like Slack if having time.
 
 ### 5.4 Notifications
 
@@ -114,7 +149,7 @@ Creating a small server who’s running on a Raspberry Pi and acts as a ”middl
 
 All authentication and authorization will be handled by a JSON Web Token (JWT).  When the user is signing in to the application, a token is assigned for the user and saved in clients local storage.
 That token has to be included in the header for requests made from client to server that needs authorization. 
-If a token is already stored in cleats local storage, it will be validated to see if it is still valid. If it isn’t the user will be asked to sign in again.
+If a token is already stored in clients local storage, it will be validated to see if it is still valid. If it isn’t the user will be asked to sign in again.
 
 ## 6. External systems
 
