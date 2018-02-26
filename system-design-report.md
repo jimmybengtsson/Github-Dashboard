@@ -59,16 +59,24 @@ A User can be created with with entities like, id, username, password hashed wit
 Despite the large options available for creating components and more with React, a bootstrap-library will be included. I believe the simplicity and look of Twitter’s bootstrap fits well with the design approach I’ve decided for the application.
 
 **Dashboard**
+
 ![Dashboard](./wiki-img/web-mockup.png)
 
+
 **Github**
+
 ![Github](./wiki-img/web-mockup-github.png)
 
+
 **Settings**
+
 ![Settings](./wiki-img/web-mockup-settings-github.png)
 
+
 For each service the user is adding a new link will be added in menu.
+
 ![Add menu](./wiki-img/add-webhook.png)
+
 
 ## 5. Detailed design
 
