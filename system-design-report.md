@@ -135,7 +135,7 @@ When a user is signing in to Github through the application, a connection betwee
 The main plan for handling notifications in the application is to let a Philips Hue-Lamp in my house flash when a new notification is received. But as for the time if writing this, the so called Externa Philips Hue API isn’t available to the public. They only provide a API that can handle lamps on an internal network.
 I have applied for a key to use the externa API but hasn’t recessen any answer yet. So further down I present some alternate scenarios for handling notifications. 
 
-If I don’t receive any credentials to use the external Philips Hue API I present to alternate scenarios for handling notifications.
+If I don’t receive any credentials to use the external Philips Hue API I present two alternate scenarios for handling notifications.
 
 **Alternative 1 - Service Worker:**
 
@@ -143,7 +143,7 @@ A service worker is registered when a user is using the application and sends no
 
 **Alternative 2 - Connect to an Raspberry Pi on my network using the the Internal Philips Hue API:**
 
-Creating a small server who’s running on a Raspberry Pi and acts as a ”middleman” to use the local Philips Hue API at my home. But one big issue by doing so is that it will only be available for me or for anyone using a Raspberry Pi with the same server controlling the local API. 
+Creating a small server who’s running on a Raspberry Pi and acts as a ”middleman” to use the local Philips Hue API at my home. But one big issue by doing so is that it will only be available for me or for anyone using a Raspberry Pi with the same server controlling the local Philips Hue API. 
 
 ### 5.5 Authentication / Authorization
 
