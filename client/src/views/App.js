@@ -1,19 +1,41 @@
 import React, { Component } from 'react';
-import logo from '../logo.svg';
+import { BrowserRouter as Router, Link, Route } from 'react-router-dom';
 import '../style/App.css';
 
+// Material UI
+import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import AppBar from 'material-ui/AppBar';
+
+import Dashboard from './Dashboard';
+import Github from './Github';
+import Settings from './Settings';
+
 class App extends Component {
+
+    constructor(props){
+        super(props);
+
+        this.state = {
+            page: 'Dashboard',
+        };
+        //this.isSignedIn = this.isSignedIn.bind(this);
+    }
+
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
+            <MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}>
+                <Router>
+                      <div className="App">
+                          <AppBar title={this.state.page} />
+                          <Route path="/" exact={true} component={Dashboard}/>
+                          <Route path="/github" component={Github}/>
+                          <Route path="/settings" component={Settings}/>
+                      </div>
+                </Router>
+            </MuiThemeProvider>
+
     );
   }
 }
