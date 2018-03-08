@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Link, Route } from 'react-router-dom';
-import '../style/Github.css';
+import './Settings.css';
 
 class Github extends Component {
     render() {
         return (
-            <div className="View-body">
+            <div className="Github-body">
                 <p>Github</p>
             </div>
         );
