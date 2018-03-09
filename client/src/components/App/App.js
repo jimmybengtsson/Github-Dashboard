@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Link, Route } from 'react-router-dom';
 import './App.css';
+import { getUserInfo } from "../../utils/Github/Requests";
 
 // Material UI
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
+import {Toolbar, ToolbarGroup} from 'material-ui/Toolbar';
 import MenuItem from 'material-ui/MenuItem';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import {cyan500} from 'material-ui/styles/colors';
@@ -13,10 +14,6 @@ import {cyan500} from 'material-ui/styles/colors';
 import Dashboard from '../Dashboard/Dashboard';
 import Github from '../Github/Github';
 import Settings from '../Settings/Settings';
-import SignIn from '../Auth/SignIn';
-import Register from '../Auth/Register';
-
-require('dotenv').config();
 
 class App extends Component {
 
@@ -24,16 +21,60 @@ class App extends Component {
         super(props);
 
         this.state = {
-            page: 'Dashboard',
             menuValue: 1,
+            github: false,
         };
-        //this.isSignedIn = this.isSignedIn.bind(this);
+        this.handleStateChange = this.handleStateChange.bind(this);
+        this.handleHeaderTitle = this.handleHeaderTitle.bind(this);
     }
 
     handleChange = (event, index, menuValue) => this.setState({menuValue});
 
+    handleStateChange(value, github, firebase) {
+        this.setState({
+
+            github: value,
+            githubData: github,
+            user: firebase,
+        });
+    }
+
+    handleHeaderTitle(value) {
+        this.setState({
+            menuValue: value,
+        });
+    }
+
+    componentWillMount() {
+        if(localStorage.getItem('userData')) {
+
+            let userData = JSON.parse(localStorage.getItem('userData'));
+
+            getUserInfo(userData.githubToken)
+                .then((response) => {
+
+                    console.log(response);
+                    this.setState({
+                        githubData: response.data,
+                        github: true,
+                        user: userData,
+                    });
+
+                }).catch((error) => {
+                    console.log(error);
+                });
+
+        } else {
+            this.setState({
+                githubData: null,
+                user: null,
+                github: false,
+            });
+        }
+    }
 
     render() {
+        console.log(this.state);
     return (
         <MuiThemeProvider muiTheme={muiTheme}>
                 <Router>
@@ -56,11 +97,9 @@ class App extends Component {
                               </ToolbarGroup>
                           </Toolbar>
 
-                          <Route path="/" exact={true} component={Dashboard}/>
-                          <Route path="/github" component={Github}/>
-                          <Route path="/settings" component={Settings}/>
-                          <Route path="/signin" component={SignIn}/>
-                          <Route path="/register" component={Register}/>
+                          <Route path="/" exact={true} component={() => <Dashboard state={this.state}/>} />
+                          <Route path="/github" component={() => <Github state={this.state}/>}/>
+                          <Route path="/settings" component={() => <Settings state={this.state} handleStateChange={this.handleStateChange}/>}/>
                       </div>
                 </Router>
         </MuiThemeProvider>

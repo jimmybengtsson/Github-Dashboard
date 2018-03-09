@@ -4,8 +4,9 @@ import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 import Divider from 'material-ui/Divider';
 import Toggle from 'material-ui/Toggle';
+import {getUserInfo} from "../../utils/Github/Requests";
 
-import { GithubAuth } from '../Firebase/SignIn';
+import { GithubAuth, SignOut } from '../../utils/Firebase/SignIn';
 
 class Settings extends Component {
 
@@ -13,23 +14,37 @@ class Settings extends Component {
         super(props);
 
         this.state = {
-            github: false
+            github: this.props.state.github,
 
         };
         this.githubState = this.githubState.bind(this);
     }
 
     githubState() {
+
         console.log(this.state);
+
         if (this.state.github === true) {
-            return this.setState({
-                github: false,
+
+            SignOut().then(() => {
+                return this.props.handleStateChange(false, null, null);
+
+            }).catch((err) => {
+                throw new Error(err);
+
+            });
+        } else {
+
+            // Sign in to Github. Popup.
+            GithubAuth().then((result) => {
+                getUserInfo(result.githubToken).then((response) => {
+                    this.props.handleStateChange(true, response.data, result);
+                });
+
+            }).catch((err) => {
+                throw new Error(err);
             });
         }
-        GithubAuth();
-        return this.setState({
-            github: true,
-        });
     }
 
     render() {
