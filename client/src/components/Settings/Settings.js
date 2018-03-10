@@ -26,24 +26,32 @@ class Settings extends Component {
 
         if (this.state.github === true) {
 
-            SignOut().then(() => {
-                return this.props.handleStateChange(false, null, null);
+            SignOut()
+                .then(() => {
 
-            }).catch((err) => {
+                this.props.handleStateChange(false, false, false, false, true, 'Signed out from Github');
+
+                })
+                .catch((err) => {
                 throw new Error(err);
 
             });
         } else {
 
             // Sign in to Github. Popup.
-            GithubAuth().then((result) => {
-                getUserInfo(result.githubToken).then((response) => {
-                    this.props.handleStateChange(true, response.data, result);
-                });
+            GithubAuth()
+                .then((result) => {
 
-            }).catch((err) => {
+                    getUserInfo(result.githubToken)
+
+                        .then((response) => {
+
+                            this.props.handleStateChange(true, response.data, result.info, result.githubToken, true, 'Signed in to Github');
+                        });
+                })
+                .catch((err) => {
                 throw new Error(err);
-            });
+                });
         }
     }
 

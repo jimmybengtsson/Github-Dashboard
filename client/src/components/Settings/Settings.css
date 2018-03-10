@@ -37,3 +37,23 @@
     flex-direction: row;
     justify-content: space-between;
 }
+@media only screen and (max-width: 600px) {
+
+    .View-body {
+        flex-direction: column;
+    }
+
+    .Settings-body {
+        width: 100%;
+        height: 70%;
+    }
+
+    .Signin-body {
+        width: 100%;
+        height: 30%;
+        border-right: 0 solid #cbced0;
+        text-align: left;
+
+
+    }
+}

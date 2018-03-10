@@ -10,6 +10,7 @@ import {Toolbar, ToolbarGroup} from 'material-ui/Toolbar';
 import MenuItem from 'material-ui/MenuItem';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import {cyan500} from 'material-ui/styles/colors';
+import Snackbar from 'material-ui/Snackbar';
 
 import Dashboard from '../Dashboard/Dashboard';
 import Github from '../Github/Github';
@@ -23,27 +24,34 @@ class App extends Component {
         this.state = {
             menuValue: 1,
             github: false,
+            openSnackBar: false,
+            snackBarMessage: ''
         };
         this.handleStateChange = this.handleStateChange.bind(this);
-        this.handleHeaderTitle = this.handleHeaderTitle.bind(this);
+        this.closeSnackBar = this.closeSnackBar.bind(this);
     }
 
     handleChange = (event, index, menuValue) => this.setState({menuValue});
 
-    handleStateChange(value, github, firebase) {
+    handleStateChange(value, github, firebase, token, openSB, messageSB) {
         this.setState({
 
             github: value,
             githubData: github,
             user: firebase,
+            githubToken: token,
+            openSnackBar: openSB,
+            snackBarMessage: messageSB,
+
         });
     }
 
-    handleHeaderTitle(value) {
+    closeSnackBar() {
         this.setState({
-            menuValue: value,
+            openSnackBar: false,
+            snackBarMessage: '',
         });
-    }
+    };
 
     componentWillMount() {
         if(localStorage.getItem('userData')) {
@@ -57,7 +65,8 @@ class App extends Component {
                     this.setState({
                         githubData: response.data,
                         github: true,
-                        user: userData,
+                        user: userData.info,
+                        githubToken: userData.githubToken,
                     });
 
                 }).catch((error) => {
@@ -66,9 +75,10 @@ class App extends Component {
 
         } else {
             this.setState({
-                githubData: null,
-                user: null,
+                githubData: false,
+                user: false,
                 github: false,
+                githubToken: false,
             });
         }
     }
@@ -100,6 +110,12 @@ class App extends Component {
                           <Route path="/" exact={true} component={() => <Dashboard state={this.state}/>} />
                           <Route path="/github" component={() => <Github state={this.state}/>}/>
                           <Route path="/settings" component={() => <Settings state={this.state} handleStateChange={this.handleStateChange}/>}/>
+                          <Snackbar
+                              open={this.state.openSnackBar}
+                              message={this.state.snackBarMessage}
+                              autoHideDuration={4000}
+                              onRequestClose={this.closeSnackBar}
+                          />
                       </div>
                 </Router>
         </MuiThemeProvider>

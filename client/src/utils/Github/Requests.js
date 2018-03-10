@@ -21,21 +21,34 @@ export const getUserInfo = (token) => {
     });
 };
 
-export const getOrganizations = (token, user) => {
+export const getOrganizations = (token) => {
 
-    return new Promise((resolve, reject) => {
-
-        axios.get(githubURL + 'user/orgs', {
+        return axios.get(githubURL + 'user/orgs', {
             params: {
                 access_token: token
 
             }
         }).then((response) => {
 
-            resolve(response);
+            return response.data;
 
         }).catch((error) => {
-            reject(error);
+            console.log(error);
         });
+};
+
+export const getOrgRepos = (token, url) => {
+
+    return axios.get(url, {
+        params: {
+            access_token: token
+
+        }
+    }).then((response) => {
+
+        return response.data;
+
+    }).catch((error) => {
+        console.log(error);
     });
 };
