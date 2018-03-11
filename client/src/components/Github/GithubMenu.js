@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
-import {getOrganizations, getOrgRepos} from "../../utils/Github/Requests";
+import {getOrganizations} from "../../utils/Github/Requests";
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import CircularProgress from 'material-ui/CircularProgress';
-import {List, ListItem} from 'material-ui/List';
-import Subheader from 'material-ui/Subheader';
-import Divider from 'material-ui/Divider';
 
 import './Github.css';
+import {cyan500} from "material-ui/styles/colors";
 
 let tempOrgs;
 
@@ -76,12 +74,18 @@ class GithubMenu extends Component {
         return (
             <div>
             {this.state.isLoaded ? (
-                    <DropDownMenu value={this.state.menuValue} onChange={this.handleMenuChange}>
+                    <DropDownMenu
+                        value={this.state.menuValue}
+                        onChange={this.handleMenuChange}
+                        selectedMenuItemStyle={{
+                            color: cyan500,
+                        }}
+                    >
                         {this.state.renderedOrgs}
                     </DropDownMenu>
 
                 ) : (
-                    <CircularProgress />
+                    <CircularProgress style={style.spinner}/>
                 )}
             </div>
         );
@@ -89,3 +93,11 @@ class GithubMenu extends Component {
 }
 
 export default GithubMenu;
+
+
+const style = {
+    spinner: {
+
+        margin: 'auto',
+    }
+};

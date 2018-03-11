@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-import {getOrganizations, getOrgRepos} from "../../utils/Github/Requests";
-import DropDownMenu from 'material-ui/DropDownMenu';
-import MenuItem from 'material-ui/MenuItem';
-import CircularProgress from 'material-ui/CircularProgress';
+import {getOrgRepos} from "../../utils/Github/Requests";
 import {List, ListItem} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 import Divider from 'material-ui/Divider';
@@ -22,14 +19,15 @@ class GithubRepoList extends Component {
             isLoaded: false,
         };
 
-        this.handleMenuChange = this.handleMenuChange.bind(this);
         this.getRepos = this.getRepos.bind(this);
     }
 
-    handleMenuChange(event, index, value) {
+    handleMenuChange(i, value) {
         this.setState({
             menuValue: value,
         });
+        console.log(i);
+        this.props.setRepoContent(i);
     }
 
     getRepos(url) {
@@ -42,9 +40,12 @@ class GithubRepoList extends Component {
                 response.forEach((i) => {
 
                     tempValue = tempValue + 1;
-                    tempRepos.push(<ListItem value={tempValue} key={i.id} primaryText={i.full_name} data={i}/>);
+                    tempRepos.push(<ListItem value={tempValue} key={i.id} primaryText={i.name} data={i} onClick={this.handleMenuChange.bind(this, i, tempValue)}/>);
                 });
             })
+            /*.then(() => {
+                this.props.setRepoContent(tempRepos[this.state.menuValue - 1].props.data.events_url);
+            })*/
             .then(() => {
                 this.setState({
                     isLoaded: true,
@@ -69,9 +70,12 @@ class GithubRepoList extends Component {
 
         return (
             <div className="List">
-                <List>
+                <Divider />
+                <Subheader>Repositories:</Subheader>
+                <List >
                     {tempRepos}
                     </List>
+                <Divider />
             </div>
         );
     }

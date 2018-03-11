@@ -52,3 +52,22 @@ export const getOrgRepos = (token, url) => {
         console.log(error);
     });
 };
+
+export const getRepoCommits = (token, url) => {
+
+    let strippedUrl = url.replace(/{.*}/, '');
+
+    return axios.get(strippedUrl, {
+        params: {
+            access_token: token
+
+        }
+    }).then((response) => {
+
+        console.log(response);
+        return response.data;
+
+    }).catch((error) => {
+        console.log(error);
+    });
+};

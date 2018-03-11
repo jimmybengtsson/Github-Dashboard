@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import {getOrganizations} from "../../utils/Github/Requests";
 import CircularProgress from 'material-ui/CircularProgress';
 
 import './Github.css';
 import GithubMenu from "./GithubMenu";
 import GithubRepoList from './GithubRepoList';
+import GithubContent from "./GithubContent";
 
 class Github extends Component {
 
@@ -18,12 +18,20 @@ class Github extends Component {
         };
 
         this.setRepoUrl = this.setRepoUrl.bind(this);
+        this.setRepoContent = this.setRepoContent.bind(this);
 
     }
 
     setRepoUrl(url) {
         this.setState({
             repoUrl: url,
+        });
+        console.log(this.state);
+    }
+
+    setRepoContent(url) {
+        this.setState({
+            repoContent: url,
         });
         console.log(this.state);
     }
@@ -35,13 +43,22 @@ class Github extends Component {
         return (
             <div className="View-body">
                 {githubLoggedIn ?  (
-                    <div className="Menu-body">
-                        <GithubMenu githubToken={this.state.githubToken} githubData={this.state.githubData} setRepoUrl={this.setRepoUrl}/>
-                        {this.state.repoUrl ? (
-                            <GithubRepoList state={this.state} githubToken={this.state.githubToken}/>
-                        ) : (
-                            <CircularProgress />
-                        )}
+                    <div className="Github-body">
+                        <div className="Menu-body">
+                            <GithubMenu githubToken={this.state.githubToken} githubData={this.state.githubData} setRepoUrl={this.setRepoUrl}/>
+                            {this.state.repoUrl ? (
+                                <GithubRepoList state={this.state} githubToken={this.state.githubToken} setRepoContent={this.setRepoContent}/>
+                            ) : (
+                                <CircularProgress style={style.spinner}/>
+                            )}
+                        </div>
+                        <div className="Content-body">
+                            {this.state.repoContent ? (
+                                <GithubContent state={this.state}/>
+                            ) : (
+                                <p className="message">Click on repository to view events!</p>
+                            )}
+                        </div>
                     </div>
                 ) : (
                     <div className="message">
@@ -56,22 +73,9 @@ class Github extends Component {
 
 export default Github;
 
-/* getUsersOrgs() {
+const style = {
+    spinner: {
 
-    if (!this.state.user) {
-        return <div className="message">
-            <p>You have to sign in to Github to view this.</p>
-            <p>Please go to settings!</p>
-        </div>;
-    } else {
-
-        getOrganizations(this.state.user.githubToken)
-            .then((response) => {
-                console.log(response.data);
-                return <GithubRepoList/>
-            })
-            .catch((err) => {
-                console.log(err);
-            })
+        margin: 'auto',
     }
-}*/
+};
