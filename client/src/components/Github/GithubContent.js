@@ -8,8 +8,12 @@ import Divider from 'material-ui/Divider';
 import './Github.css';
 import {cyan500} from "material-ui/styles/colors";
 import GithubEvent from "./GithubEvent";
+import GithubChart from "./GithubChart";
 
-let tempEvents;
+let eventsArray;
+let newEventsArray;
+let tempArray;
+let chartArray;
 
 class GithubContent extends Component {
 
@@ -25,7 +29,10 @@ class GithubContent extends Component {
 
     getRepoInformation(commitsUrl, issuesUrl, releasesUrl) {
 
-        tempEvents = [];
+        eventsArray = [];
+        newEventsArray = [];
+        tempArray = [];
+        chartArray = [];
         let tempValue = 0;
 
         getRepoCommits(this.props.state.githubToken, commitsUrl)
@@ -33,11 +40,12 @@ class GithubContent extends Component {
 
                 response.forEach((i) => {
 
+                    chartArray.push({event: 'Commit', date: i.commit.committer.date});
+
                     tempValue = tempValue + 1;
-                    tempEvents.push(<GithubEvent
+                    eventsArray.push(<GithubEvent
                         value={tempValue}
-                        key={i.id}
-                        data={i}
+                        key={tempValue}
                         author={i.committer.login}
                         avatar={i.committer.avatar_url}
                         event={'Commit'}
@@ -52,11 +60,12 @@ class GithubContent extends Component {
 
                     response.forEach((i) => {
 
+                        chartArray.push({event: 'Issue', date: i.created_at});
+
                         tempValue = tempValue + 1;
-                        tempEvents.push(<GithubEvent
+                        eventsArray.push(<GithubEvent
                             value={tempValue}
-                            key={i.id}
-                            data={i}
+                            key={tempValue}
                             author={i.user.login}
                             avatar={i.user.avatar_url}
                             event={'Issue'}
@@ -71,22 +80,22 @@ class GithubContent extends Component {
 
                             response.forEach((i) => {
 
+                                chartArray.push({event: 'Release', date: i.published_at});
+
                                 tempValue = tempValue + 1;
-                                tempEvents.push(<GithubEvent
+                                eventsArray.push(<GithubEvent
                                     value={tempValue}
-                                    key={i.id}
-                                    data={i}
+                                    key={tempValue}
                                     author={i.author.login}
                                     avatar={i.author.avatar_url}
                                     event={'Release'}
-                                    date={i.created_at}
+                                    date={i.published_at}
                                     message={i.tag_name + ': ' + i.name}
                                     url={i.html_url}
                                 />);
                             });
                         }).then(() => {
-                            console.log(tempEvents);
-                            tempEvents.sort(function(a, b){
+                            eventsArray.sort(function(a, b){
                                 let keyA = new Date(a.props.date);
                                 let keyB = new Date(b.props.date);
                                 // Compare the 2 dates
@@ -96,6 +105,24 @@ class GithubContent extends Component {
                             });
                         })
                             .then(() => {
+                                tempArray = eventsArray;
+
+                                let userData = JSON.parse(localStorage.getItem('userData'));
+
+                                tempArray.forEach((i) => {
+
+                                    let newDate = new Date(i.props.date).getTime();
+
+                                    if(newDate > userData.info.lastLoginAt) {
+
+                                        newEventsArray.push(i);
+                                        eventsArray.splice(i, 1);
+                                    }
+                                });
+                            })
+                            .then(() => {
+                                console.log(eventsArray);
+                                console.log(newEventsArray);
                                 this.setState({
                                     isLoaded: true,
                                 });
@@ -122,15 +149,30 @@ class GithubContent extends Component {
                 {this.state.isLoaded ? (
                     <div className="Content">
                         <div className="Content-graph">
-                            <p>Graph</p>
+                           <GithubChart data={chartArray}/>
                         </div>
-                        <div className="Content-events">
-                            <Divider />
-                            <Subheader>Events:</Subheader>
-                            <List >
-                                {tempEvents}
-                            </List>
-                        </div>
+                        {newEventsArray.length <= 0 ? (
+                            <div className="Content-events">
+                                <Divider />
+                                <Subheader>Events:</Subheader>
+                                <List >
+                                    {eventsArray}
+                                </List>
+                            </div>
+                        ) : (
+                            <div className="Content-events">
+                                <Divider />
+                                <Subheader>New events:</Subheader>
+                                <List >
+                                    {newEventsArray}
+                                </List>
+                                <Subheader>Events:</Subheader>
+                                <List >
+                                    {eventsArray}
+                                </List>
+                            </div>
+                        )}
+
                     </div>
                 ) : (
                     <CircularProgress style={style.spinner}/>

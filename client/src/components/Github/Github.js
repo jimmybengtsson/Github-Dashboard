@@ -54,7 +54,7 @@ class Github extends Component {
                         </div>
                         <div className="Content-body">
                             {this.state.repoContent ? (
-                                <GithubContent state={this.state}/>
+                                <GithubContent state={this.state} data={this.props.state}/>
                             ) : (
                                 <p className="message">Click on repository to view events!</p>
                             )}

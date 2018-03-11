@@ -7,8 +7,7 @@ provider.addScope('repo');
 
 export const GithubAuth = () => {
 
-    return new Promise((resolve, reject) => {
-        auth.signInWithPopup(provider).then((result) => {
+        return auth.signInWithPopup(provider).then((result) => {
 
             let user = {
                 githubToken: result.credential.accessToken,
@@ -18,12 +17,11 @@ export const GithubAuth = () => {
             console.log(user.info);
 
             localStorage.setItem('userData', JSON.stringify(user));
-            resolve(user);
+            return user;
 
         }).catch(function(error) {
-            reject(error)
+            console.log(error);
         });
-    });
 };
 
 export const SignOut = () => {

@@ -54,12 +54,13 @@
     width: 30%;
     min-height: 100%;
     border-left: 1px solid #cbced0;
+    text-align: left;
 }
 
 .Event {
 
     text-align: left;
-    margin: auto;
+    margin: 2px;
 }
 
 

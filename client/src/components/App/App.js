@@ -58,6 +58,8 @@ class App extends Component {
 
             let userData = JSON.parse(localStorage.getItem('userData'));
 
+            console.log(userData);
+
             getUserInfo(userData.githubToken)
                 .then((response) => {
 
@@ -84,7 +86,6 @@ class App extends Component {
     }
 
     render() {
-        console.log(this.state);
     return (
         <MuiThemeProvider muiTheme={muiTheme}>
                 <Router>
