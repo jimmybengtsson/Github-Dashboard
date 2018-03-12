@@ -1,14 +1,9 @@
 import React, { Component } from 'react';
-import CircularProgress from 'material-ui/CircularProgress';
 import {Line} from 'react-chartjs-2';
+import FlatButton from 'material-ui/FlatButton';
 
 import './Github.css';
 let momentIterator = require('moment-iterator');
-
-let chartTable;
-let chartCommits;
-let chartIssues;
-let chartReleases;
 
 class GithubChart extends Component {
 
@@ -17,8 +12,30 @@ class GithubChart extends Component {
 
         this.state = {
 
-            table: [],
+            table: 'Week',
         };
+        this.checkTableChange = this.checkTableChange.bind(this);
+        this.handleClick = this.handleClick.bind(this);
+    }
+
+    handleClick(value) {
+        this.setState({
+            table: value,
+        }, () => this.checkTableChange());
+
+    }
+
+    checkTableChange() {
+        if(this.state.table === 'Year') {
+            return this.getYear();
+
+        }else if(this.state.table === 'Month') {
+            return this.getMonth();
+
+        } else {
+            return this.getWeek();
+        }
+
     }
 
     deleteChartData() {
@@ -132,8 +149,6 @@ class GithubChart extends Component {
         let temp = new Date().setFullYear(start.getFullYear() - 1);
         let end = new Date(temp);
 
-        console.log(this.props.data);
-
         let tempArray = [];
 
         for (let i = 0; i < this.props.data.length; i++) {
@@ -174,10 +189,13 @@ class GithubChart extends Component {
     }
 
     componentWillMount() {
-        this.getYear();
+        this.checkTableChange();
     }
     componentWillReceiveProps() {
-        this.getYear();
+        this.checkTableChange();
+    }
+    componentDidUpdate() {
+        this.checkTableChange();
     }
 
     render() {
@@ -186,8 +204,24 @@ class GithubChart extends Component {
 
         return (
             <div className="Chart-body">
-                <p>Chart</p>
                 <Line data={data} />
+                <div className="Chart-buttons">
+                    <FlatButton
+                        label="Week"
+                        primary={true}
+                        onClick={() => this.handleClick('Week')}
+                    />
+                    <FlatButton
+                        label="Month"
+                        primary={true}
+                        onClick={() => this.handleClick('Month')}
+                    />
+                    <FlatButton
+                        label="Year"
+                        primary={true}
+                        onClick={() => this.handleClick('Year')}
+                    />
+                </div>
             </div>
         );
     }
@@ -196,13 +230,6 @@ class GithubChart extends Component {
 
 
 export default GithubChart;
-
-const style = {
-    spinner: {
-
-        margin: 'auto',
-    }
-};
 
 let data = {
     labels: [],

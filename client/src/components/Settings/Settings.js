@@ -7,6 +7,7 @@ import Toggle from 'material-ui/Toggle';
 import {getUserInfo} from "../../utils/Github/Requests";
 
 import { GithubAuth, SignOut } from '../../utils/Firebase/SignIn';
+import SettingsGithub from "./SettingsGithub";
 
 class Settings extends Component {
 
@@ -56,6 +57,7 @@ class Settings extends Component {
     }
 
     render() {
+
         return (
             <div className="View-body">
                 <div className="Signin-body">
@@ -84,7 +86,13 @@ class Settings extends Component {
                     </List>
                 </div>
                 <div className="Settings-body">
-
+                    {this.state.github ? (
+                        <SettingsGithub data={this.props.state}/>
+                    ) : (
+                        <div className="message">
+                            <p>You have to sign in to Github to view this.</p>
+                        </div>
+                    )}
                 </div>
             </div>
         );

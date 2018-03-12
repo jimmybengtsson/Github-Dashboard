@@ -1,15 +1,28 @@
-import { auth } from './Initialize';
-import * as firebase from 'firebase';
+import { database } from './Initialize';
 
-export const updateUserData = (userId, data) => {
+export const updateWebhookSettings = (userId, data) => {
 
-    return new Promise((resolve, reject) => {
+    console.log(userId);
+    console.log(data);
+    return database.ref('users/' + userId + '/githubWebhooks').update({
+        [data.id]: data,
+    })
+        .then((response) => {
+            return response;
+        })
+        .catch((err) => {
+            console.log(err);
+        });
 
-        let postData = {
-            name: data.name,
+};
 
+export const fetchWebhookSettings = (userId) => {
 
-        };
+    console.log(userId);
+    return database.ref('users/' + userId + '/githubWebhooks')
+        .once('value', (snapshot) => {
+            console.log(snapshot.val());
+            return snapshot.val();
+        });
 
-    });
 };

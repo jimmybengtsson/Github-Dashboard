@@ -9,6 +9,18 @@
 .Settings-body {
     width: 70%;
     height: 100%;
+    text-align: left;
+}
+
+.Github-settings-body {
+    width: 100%;
+    height: 100%;
+}
+
+.Repo-settings {
+    width: 100%;
+    height: 100%;
+    text-align: center;
 }
 
 .Signin-body {
@@ -16,8 +28,6 @@
     height: 100%;
     border-right: 1px solid #cbced0;
     text-align: left;
-
-
 }
 
 .Signin-div {
@@ -37,6 +47,12 @@
     flex-direction: row;
     justify-content: space-between;
 }
+
+.message {
+    margin: auto;
+    color: #737373;
+}
+
 @media only screen and (max-width: 600px) {
 
     .View-body {

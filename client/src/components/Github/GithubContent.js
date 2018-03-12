@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
-import {getOrgRepos, getRepoCommits} from "../../utils/Github/Requests";
+import {getRepoCommits} from "../../utils/Github/Requests";
 import CircularProgress from 'material-ui/CircularProgress';
-import {List, ListItem} from 'material-ui/List';
+import {List} from 'material-ui/List';
 import Subheader from 'material-ui/Subheader';
 import Divider from 'material-ui/Divider';
 
 import './Github.css';
-import {cyan500} from "material-ui/styles/colors";
 import GithubEvent from "./GithubEvent";
 import GithubChart from "./GithubChart";
 
@@ -27,6 +26,7 @@ class GithubContent extends Component {
 
     }
 
+    // Ugly promise-nesting but need to fetch Github-data synchronously!
     getRepoInformation(commitsUrl, issuesUrl, releasesUrl) {
 
         eventsArray = [];
@@ -149,6 +149,7 @@ class GithubContent extends Component {
                 {this.state.isLoaded ? (
                     <div className="Content">
                         <div className="Content-graph">
+                            <p style={{fontSize: '150%', marginBottom: '20px', color: '#505050'}}>{this.props.state.repoContent.name}</p>
                            <GithubChart data={chartArray}/>
                         </div>
                         {newEventsArray.length <= 0 ? (

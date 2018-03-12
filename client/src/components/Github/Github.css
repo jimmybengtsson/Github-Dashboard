@@ -55,6 +55,7 @@
     min-height: 100%;
     border-left: 1px solid #cbced0;
     text-align: left;
+    overflow: auto;
 }
 
 .Event {
@@ -106,4 +107,8 @@
 
 
     }
+}
+
+::-webkit-scrollbar {
+    display: none;
 }
