@@ -15,6 +15,7 @@ import Snackbar from 'material-ui/Snackbar';
 import Dashboard from '../Dashboard/Dashboard';
 import Github from '../Github/Github';
 import Settings from '../Settings/Settings';
+import {updateUserData} from "../../utils/Firebase/Database";
 
 class App extends Component {
 
@@ -71,7 +72,18 @@ class App extends Component {
                         githubToken: userData.githubToken,
                     });
 
-                }).catch((error) => {
+                })
+                .then(() => {
+
+                    console.log(this.state);
+                    let userData = {
+                        githubToken: this.state.githubToken,
+                        githubName: this.state.githubData.login,
+                        githubId: this.state.githubData.id,
+                    };
+                    updateUserData(this.state.user.uid, userData)
+                })
+                .catch((error) => {
                     console.log(error);
                 });
 

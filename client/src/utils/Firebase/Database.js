@@ -26,3 +26,20 @@ export const fetchWebhookSettings = (userId) => {
         });
 
 };
+
+export const updateUserData = (userId, data) => {
+
+    return database.ref('users/' + userId).update({
+
+        githubName: data.githubName,
+        githubToken: data.githubToken,
+        githubId: data.githubId,
+    })
+        .then((response) => {
+            console.log(response);
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+
+};
