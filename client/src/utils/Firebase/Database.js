@@ -2,8 +2,6 @@ import { database } from './Initialize';
 
 export const updateWebhookSettings = (userId, data) => {
 
-    console.log(userId);
-    console.log(data);
     return database.ref('users/' + userId + '/githubWebhooks').update({
         [data.id]: data,
     })
@@ -18,10 +16,8 @@ export const updateWebhookSettings = (userId, data) => {
 
 export const fetchWebhookSettings = (userId) => {
 
-    console.log(userId);
     return database.ref('users/' + userId + '/githubWebhooks')
         .once('value', (snapshot) => {
-            console.log(snapshot.val());
             return snapshot.val();
         });
 
@@ -35,11 +31,40 @@ export const updateUserData = (userId, data) => {
         githubToken: data.githubToken,
         githubId: data.githubId,
     })
-        .then((response) => {
-            console.log(response);
-        })
         .catch((err) => {
             console.log(err);
         });
 
+};
+
+export const fetchUserData = (userId) => {
+    return database.ref('users/' + userId).once('value')
+        .then((response) => {
+            return response;
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+};
+
+export const updateWebhookId = (userId, data) => {
+
+    return database.ref('users/' + userId).update({
+
+        webhookId: data,
+    })
+        .catch((err) => {
+            console.log(err);
+        });
+
+};
+
+export const fetchWebhookId = (userId) => {
+    return database.ref('users/' + userId + '/webhookId').once('value')
+        .then((response) => {
+            return response;
+        })
+        .catch((err) => {
+            console.log(err);
+        });
 };

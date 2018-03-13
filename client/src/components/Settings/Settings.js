@@ -16,6 +16,7 @@ class Settings extends Component {
 
         this.state = {
             github: this.props.state.github,
+            philipsHue: this.props.state.philipsHue,
 
         };
         this.githubState = this.githubState.bind(this);

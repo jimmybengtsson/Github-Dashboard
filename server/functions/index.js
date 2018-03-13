@@ -1,8 +1,20 @@
-const functions = require('firebase-functions');
+let functions = require('firebase-functions');
+let admin = require('firebase-admin');
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//  response.send("Hello from Firebase!");
-// });
+let Webhook = require('./controller/Webhook');
+
+admin.initializeApp(functions.config().firebase);
+
+exports.webhook = functions.https.onRequest((req, res) => {
+    console.log(req.body);
+    console.log(req.query.foo);
+    console.log(req.body.text);
+    console.log(req.rawBody);
+
+    res.end();
+});
+
+exports.notification = functions.https.onRequest((req, res) => {
+    console.log(req.body);
+    res.end();
+});

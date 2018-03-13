@@ -8,10 +8,11 @@ import Checkbox from 'material-ui/Checkbox';
 import FlatButton from 'material-ui/FlatButton';
 import {fetchWebhookSettings, updateWebhookSettings} from "../../utils/Firebase/Database";
 import Snackbar from 'material-ui/Snackbar';
+import {createWebhook} from "../../utils/Github/Webhook";
 
 
 let tempRepos;
-let repoSettingsArray;
+let oldRepoSettings;
 
 class SettingsGithubRepos extends Component {
 
@@ -71,7 +72,6 @@ class SettingsGithubRepos extends Component {
                 for (let key in stateCopy[i].checked) {
                     if (key === objKey) {
 
-                        console.log(stateCopy[i].checked[key]);
                         return Object.values(stateCopy[i].checked[key]);
                     }
                 }
@@ -86,11 +86,14 @@ class SettingsGithubRepos extends Component {
 
         });
 
-        this.setState({
-            openSnackBar: true,
-            snackBarMessage: 'Saved to database',
+        createWebhook(this.props.data.githubToken, this.state.checked, oldRepoSettings, this.props.data.user.uid)
+            .then(() => {
+                this.setState({
+                    openSnackBar: true,
+                    snackBarMessage: 'Github webhooks saved!',
 
-        });
+                });
+            });
     }
 
     getSettingsFromDB() {
@@ -121,7 +124,9 @@ class SettingsGithubRepos extends Component {
                         }
                     };
 
-                    if(this.state.database[i.id]) {
+                    if(this.state.database.length <= 0) {
+                        this.state.checked.push(checkboxObj);
+                    } else if (this.state.database[i.id]) {
                         this.state.checked.push(this.state.database[i.id]);
                     } else {
                         this.state.checked.push(checkboxObj);
@@ -167,7 +172,6 @@ class SettingsGithubRepos extends Component {
                 this.props.setRepoContent(tempRepos[this.state.menuValue - 1].props.data.events_url);
             })*/
             .then(() => {
-                console.log(this.state);
                 this.setState({
                     isLoaded: true,
                 });
@@ -180,9 +184,16 @@ class SettingsGithubRepos extends Component {
     componentWillMount() {
         fetchWebhookSettings(this.props.data.user.uid)
             .then((response) => {
-                this.setState({
-                    database: response.val(),
-                });
+                if(response.val() || Array.isArray(response.val())) {
+                    this.setState({
+                        database: response.val(),
+                    });
+                    oldRepoSettings = response.val();
+                } else {
+                    this.setState({
+                        database: [],
+                    });
+                }
             }).then(() => {
             this.getRepos(this.props.repoUrl);
         });
@@ -191,16 +202,21 @@ class SettingsGithubRepos extends Component {
     componentWillReceiveProps(nextProps) {
         fetchWebhookSettings(this.props.data.user.uid)
             .then((response) => {
-                this.setState({
-                    database: response.val(),
-                });
+                if(response.val() || Array.isArray(response.val())) {
+                    this.setState({
+                        database: response.val(),
+                    });
+                } else {
+                    this.setState({
+                        database: [],
+                    });
+                }
             }).then(() => {
             this.getRepos(nextProps.repoUrl);
         });
     }
 
     render() {
-        console.log(this.state);
         return (
             <div style={styles.root}>
                 {this.state.isLoaded ? (
