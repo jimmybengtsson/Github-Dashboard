@@ -9,7 +9,7 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import {Toolbar, ToolbarGroup} from 'material-ui/Toolbar';
 import MenuItem from 'material-ui/MenuItem';
 import DropDownMenu from 'material-ui/DropDownMenu';
-import {cyan500} from 'material-ui/styles/colors';
+import {cyan500, grey800} from 'material-ui/styles/colors';
 import Snackbar from 'material-ui/Snackbar';
 import CircularProgress from 'material-ui/CircularProgress';
 
@@ -194,8 +194,8 @@ export default App;
 
 const muiTheme = getMuiTheme({
     toolbar: {
-        backgroundColor: cyan500,
-        accent1Color: cyan500,
+        backgroundColor: grey800,
+        accent1Color: grey800,
         height: 60,
         titleFontSize: 20,
     },
@@ -203,11 +203,11 @@ const muiTheme = getMuiTheme({
 
 const style = {
     labelStyle: {
-        fontSize: 26,
+        fontSize: 22,
         color: 'white',
     },
     iconStyle: {
-        fontSize: 26,
+        fontSize: 22,
         color: 'white',
         opacity: 1,
     },
@@ -216,7 +216,7 @@ const style = {
         horizontal: 'left',
     },
     menuItemStyle: {
-        fontSize: 26,
+        fontSize: 20,
         marginTop: 10,
         marginBottom: 10,
     },

@@ -33,7 +33,7 @@
     height: 100%;
 }
 .Content-body {
-    width: 70%;
+    width: 80%;
     height: 100%;
 }
 
@@ -52,7 +52,7 @@
 
 .Content-events {
     width: 30%;
-    min-height: 100%;
+    height: 80%;
     border-left: 1px solid #cbced0;
     text-align: left;
     overflow: auto;
@@ -66,7 +66,7 @@
 
 
 .Menu-body {
-    width: 30%;
+    width: 20%;
     height: 100%;
     border-right: 1px solid #cbced0;
     text-align: left;

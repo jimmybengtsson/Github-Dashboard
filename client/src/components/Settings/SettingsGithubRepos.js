@@ -234,7 +234,7 @@ class SettingsGithubRepos extends Component {
                 {this.state.isLoaded ? (
                     <div>
                         <GridList
-                            cellHeight={180}
+                            cellHeight={'auto'}
                             style={styles.gridList}
                             cols={3}
                         >
