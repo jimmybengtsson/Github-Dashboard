@@ -19,7 +19,6 @@ class GithubContent extends Component {
     constructor(props){
         super(props);
 
-        console.log(props);
         this.state = {
             isLoaded: false,
         };
@@ -35,6 +34,7 @@ class GithubContent extends Component {
         chartArray = [];
         let tempValue = 0;
 
+        // Get commits for specific repo
         getRepoCommits(this.props.state.githubToken, commitsUrl)
             .then((response) => {
 
@@ -56,6 +56,7 @@ class GithubContent extends Component {
                 });
             })
             .then(() => {
+                // Get issues for specific repo
                 getRepoCommits(this.props.state.githubToken, issuesUrl).then((response) => {
 
                     response.forEach((i) => {
@@ -76,6 +77,7 @@ class GithubContent extends Component {
                     });
                 })
                     .then(() => {
+                        // Get releases for specific repo
                         getRepoCommits(this.props.state.githubToken, releasesUrl).then((response) => {
 
                             response.forEach((i) => {
@@ -121,8 +123,7 @@ class GithubContent extends Component {
                                 });
                             })
                             .then(() => {
-                                console.log(eventsArray);
-                                console.log(newEventsArray);
+
                                 this.setState({
                                     isLoaded: true,
                                 });
@@ -130,7 +131,7 @@ class GithubContent extends Component {
                     });
             })
             .catch((err) => {
-                console.log(err);
+                throw new Error(err);
             });
     }
 

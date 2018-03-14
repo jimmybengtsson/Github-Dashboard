@@ -22,18 +22,18 @@ class Github extends Component {
 
     }
 
+    // Gets called from GithubMenu to set rep-ourl
     setRepoUrl(url) {
         this.setState({
             repoUrl: url,
         });
-        console.log(this.state);
     }
 
+    // Gets called from GithubRepoList to set repo-data
     setRepoContent(url) {
         this.setState({
             repoContent: url,
         });
-        console.log(this.state);
     }
 
     render() {

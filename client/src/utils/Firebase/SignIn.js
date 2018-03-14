@@ -19,9 +19,10 @@ export const GithubAuth = () => {
             localStorage.setItem('userData', JSON.stringify(user));
             return user;
 
-        }).catch(function(error) {
-            console.log(error);
-        });
+        })
+            .catch((err) => {
+                throw new Error(err);
+            });
 };
 
 export const SignOut = () => {
@@ -34,9 +35,9 @@ export const SignOut = () => {
                 localStorage.removeItem('userData');
                 resolve();
             })
-            .catch(function(error) {
-            reject(error)
-        });
+            .catch((err) => {
+                throw new Error(err);
+            });
     });
 };
 

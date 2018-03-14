@@ -14,7 +14,6 @@ class GithubMenu extends Component {
     constructor(props){
         super(props);
 
-        console.log(props);
         this.state = {
             menuValue: 1,
             orgs: [],
@@ -26,6 +25,7 @@ class GithubMenu extends Component {
         this.handleMenuChange = this.handleMenuChange.bind(this);
     }
 
+    // Handle organizations menu events
     handleMenuChange(event, index, value) {
         this.setState({
             menuValue: value,
@@ -35,6 +35,7 @@ class GithubMenu extends Component {
         this.props.setRepoUrl(tempOrgs[value - 1].repos_url);
     }
 
+    // Fetch all organizations from Github
     getOrganizations() {
             getOrganizations(this.props.githubToken)
                 .then((response) => {
@@ -57,19 +58,18 @@ class GithubMenu extends Component {
                     });
                 })
                 .catch((err) => {
-                    console.log(err);
+                    throw new Error(err);
                 });
     }
 
     componentDidMount() {
+
         if (this.state.orgs.length <= 0) {
             this.getOrganizations();
         }
     }
 
     render() {
-
-        console.log(this.state);
 
         return (
             <div>

@@ -33,6 +33,7 @@ class SettingsGithubRepos extends Component {
         this.getSettingsFromDB = this.getSettingsFromDB.bind(this);
     }
 
+    // Handle message-bar state
     closeSnackBar() {
         this.setState({
             openSnackBar: false,
@@ -40,6 +41,7 @@ class SettingsGithubRepos extends Component {
         });
     };
 
+    // Handle all input for webhooks on repos
     updateCheck(objId, objKey) {
 
         let stateCopy = this.state.checked;
@@ -62,6 +64,7 @@ class SettingsGithubRepos extends Component {
 
     }
 
+    // Get all input for webhooks on repos
     getCheckedState(objId, objKey) {
 
         let stateCopy = this.state.checked;
@@ -79,6 +82,7 @@ class SettingsGithubRepos extends Component {
         }
     }
 
+    // Create webhooks and save settings to db when user submits
     handleSubmit() {
 
         this.state.checked.forEach((i) => {
@@ -96,6 +100,7 @@ class SettingsGithubRepos extends Component {
             });
     }
 
+    // Fetch webhook settings
     getSettingsFromDB() {
         fetchWebhookSettings(this.props.data.user.uid)
             .then((response) => {
@@ -103,6 +108,7 @@ class SettingsGithubRepos extends Component {
             })
     }
 
+    // Fetch users repos and render to Checkbox-objects that is added to gridlist
     getRepos(url) {
 
         tempRepos = [];
@@ -168,51 +174,57 @@ class SettingsGithubRepos extends Component {
 
                 });
             })
-            /*.then(() => {
-                this.props.setRepoContent(tempRepos[this.state.menuValue - 1].props.data.events_url);
-            })*/
             .then(() => {
                 this.setState({
                     isLoaded: true,
                 });
             })
             .catch((err) => {
-                console.log(err);
+                throw new Error(err);
             });
     }
 
     componentWillMount() {
+
         fetchWebhookSettings(this.props.data.user.uid)
             .then((response) => {
+
                 if(response.val() || Array.isArray(response.val())) {
                     this.setState({
                         database: response.val(),
                     });
+
                     oldRepoSettings = response.val();
+
                 } else {
                     this.setState({
                         database: [],
                     });
                 }
             }).then(() => {
-            this.getRepos(this.props.repoUrl);
+
+                this.getRepos(this.props.repoUrl);
         });
     }
 
     componentWillReceiveProps(nextProps) {
+
         fetchWebhookSettings(this.props.data.user.uid)
             .then((response) => {
+
                 if(response.val() || Array.isArray(response.val())) {
                     this.setState({
                         database: response.val(),
                     });
+
                 } else {
                     this.setState({
                         database: [],
                     });
                 }
             }).then(() => {
-            this.getRepos(nextProps.repoUrl);
+
+                this.getRepos(nextProps.repoUrl);
         });
     }
 

@@ -1,7 +1,8 @@
 import axios from "axios/index";
-import {fetchWebhookId, updateWebhookId} from "../Firebase/Database";
+import {fetchWebhookId, updateWebhookId, removeWebhookId} from "../Firebase/Database";
 
 let webhookPushUrl = 'https://us-central1-github-dashboard-71efc.cloudfunctions.net/webhook';
+
 
 export const createWebhook = (token, newArray, oldArray, userId) => {
 
@@ -10,17 +11,13 @@ export const createWebhook = (token, newArray, oldArray, userId) => {
         let arrayToSend = [];
 
         for (let i = 0; i < newArray.length; i++) {
-
             for (let key in oldArray) {
                 if (oldArray[key].id === newArray[i].id) {
 
                     let newObject = newArray[i].checked;
                     let oldObject = oldArray[key].checked;
 
-                    console.log(newObject.commit);
-                    console.log(oldObject.commit);
-
-                    if(oldObject.commit !== newObject.commit || oldObject.issue !== newObject.issue || oldObject.release !== newObject.release) {
+                    if (oldObject.commit !== newObject.commit || oldObject.issue !== newObject.issue || oldObject.release !== newObject.release) {
 
                         arrayToSend.push(newArray[i]);
                     }
@@ -29,131 +26,134 @@ export const createWebhook = (token, newArray, oldArray, userId) => {
             }
         }
 
+        checkIfExistAndUpdate(arrayToSend, userId, token);
 
-        console.log(arrayToSend);
-        arrayToSend.forEach((i) => {
+        resolve();
 
-            let settingsArray = [];
-
-            if(i.checked.commit === true) {
-                settingsArray.push('commit_comment');
-            }
-            if(i.checked.issue === true) {
-                settingsArray.push('issues');
-            }
-            if(i.checked.release === true) {
-                settingsArray.push('release');
-            }
-
-            // Check if webhook exists and delete if no event is selected.
-            if(settingsArray.length <= 0) {
-
-                axios({
-                    method: 'GET',
-                    url: i.hook,
-                    headers: {Authorization: 'token ' + token},
-
-                })
-                    .then((response) => {
-
-                        console.log(response);
-
-                        fetchWebhookId(userId)
-                            .then((dbResponse) => {
-
-                                if (dbResponse.val() && dbResponse.val().length <= 1) {
-                                    if (response.data && response.data.length <= 1) {
-
-                                        if (dbResponse.val()[0] === response.data[0]) {
-                                        axios({
-                                            method: 'DELETE',
-                                            url: i.hook + '/' + response.data[0],
-                                            headers: {Authorization: 'token ' + token},
-
-                                        })
-                                            .then((response) => {
-
-                                                console.log(response);
-                                                resolve(response);
-
-                                            })
-                                            .catch((error) => {
-                                                console.log(error);
-                                                reject(error);
-                                            });
-                                    }
-                                } else {
-                                    dbResponse.val().foreach((i) => {
-                                        response.data.foreach((j) => {
-
-                                            if (i === j.id) {
-                                                axios({
-                                                    method: 'DELETE',
-                                                    url: i.hook + '/' + j.id,
-                                                    headers: {Authorization: 'token ' + token},
-
-                                                })
-                                                    .then((response) => {
-
-                                                        console.log(response);
-                                                        resolve(response);
-
-                                                    })
-                                                    .catch((error) => {
-                                                        console.log(error);
-                                                        reject(error);
-                                                    });
-                                            }
-                                        });
-                                    });
-                                }
-                            } else {
-                                    resolve();
-                                }
-                    })
-
-                    })
-                    .catch((error) => {
-                        reject(error);
-                    });
-
-                // If events are selected
-            } else {
-
-                // Get hooks for url to check if exists.
-                axios({
-                    method: 'GET',
-                    url: i.hook,
-                    headers: {Authorization: 'token ' + token},
-
-                })
-                    .then((response) => {
-
-
-                    })
-                    .catch((error) => {
-                        reject(error);
-                    });
-
-            }
-
-        });
     });
 };
 
-/*                        if (!response.data) {
-                            response.data = []
-                        }
+let checkIfExistAndUpdate = (arrayToSend, userId, token) => {
 
-                        fetchWebhookId(userId)
-                            .then((dbResponse) => {
+    let dbResponse;
+    let githubResponse;
 
-                                let tempDBResponse = dbResponse.val();
+    return new Promise((resolve, reject) => {
+        for (let i = 0; i < arrayToSend.length; i++) {
 
-                                if (Array.isArray(tempDBResponse) === false) {
+            axios({
+                method: 'GET',
+                url: arrayToSend[i].hook,
+                headers: {Authorization: 'token ' + token},
+
+            })
+                .then((response) => {
+
+                    if (response.data) {
+
+                        githubResponse = response.data;
+
+                    } else {
+
+                        githubResponse = [];
+                    }
+
+                    fetchWebhookId(userId)
+                        .then((data) => {
+
+                            if (data.val()) {
+
+                                dbResponse = data.val()
+
+                            } else {
+
+                                dbResponse = [];
+                            }
+                        })
+                        .then(() => {
+
+                            let settingsArray = [];
+
+                            if (arrayToSend[i].checked.commit === true) {
+                                settingsArray.push('commit_comment');
+                            }
+                            if (arrayToSend[i].checked.issue === true) {
+                                settingsArray.push('issues');
+                            }
+                            if (arrayToSend[i].checked.release === true) {
+                                settingsArray.push('release');
+                            }
+
+
+                            // Check if webhook exists and delete if no event is selected.
+                            if (settingsArray.length <= 0) {
+                                if (githubResponse.length > 0 && dbResponse.length > 0) {
+
+                                    for (let dbRes = 0; dbRes < dbResponse.length; dbRes++) {
+                                        for (let gitRes = 0; gitRes < githubResponse.length; gitRes++) {
+
+                                            if (dbResponse[dbRes] === githubResponse[gitRes].id) {
+
+                                                console.log('DELETE');
+                                                return axios({
+                                                    method: 'DELETE',
+                                                    url: arrayToSend[i].hook + '/' + githubResponse[gitRes].id,
+                                                    headers: {Authorization: 'token ' + token},
+                                                })
+                                                    .then(() => {
+
+                                                        for (let value in dbResponse) {
+                                                            if (dbResponse[value] === githubResponse[gitRes].id){
+                                                                dbResponse.splice(value, 1);
+                                                                break;
+                                                            }
+                                                        }
+                                                    })
+                                                    .catch((error) => {
+                                                        reject(error);
+                                                    });
+                                            }
+                                        }
+                                    }
+
+                                    resolve();
+                                }
+                                // If events are selected
+                            } else {
+
+                                if (githubResponse.length > 0 && dbResponse.length > 0) {
+
+                                    for (let dbRes = 0; dbRes < dbResponse.length; dbRes++) {
+                                        for (let gitRes = 0; gitRes < githubResponse.length; gitRes++) {
+
+                                            if (Number(dbResponse[dbRes]) === Number(githubResponse[gitRes].id)) {
+
+                                                console.log('PATCH');
+                                                return axios({
+                                                    method: 'PATCH',
+                                                    url: arrayToSend[i].hook + '/' + githubResponse[gitRes].id,
+                                                    headers: {Authorization: 'token ' + token},
+                                                    data: {
+                                                        active: true,
+                                                        events: settingsArray,
+                                                        config: {
+                                                            url: webhookPushUrl,
+                                                            content_type: 'json',
+                                                        }
+                                                    }
+                                                })
+                                                    .catch((error) => {
+                                                        reject(error);
+                                                    });
+                                            }
+                                        }
+                                    }
+                                } else {
+
+                                    console.log('POST');
                                     return axios({
                                         method: 'POST',
-                                        url: i.hook,
+                                        url: arrayToSend[i].hook,
                                         headers: {Authorization: 'token ' + token},
                                         data: {
                                             name: 'web',
@@ -162,272 +162,34 @@ export const createWebhook = (token, newArray, oldArray, userId) => {
                                             config: {
                                                 url: webhookPushUrl,
                                                 content_type: 'json',
-                                            } }
+                                            }
+                                        }
                                     })
                                         .then((response) => {
-
-                                            tempDBResponse = [];
-
-                                            tempDBResponse.push(response.data.id);
-
-                                            updateWebhookId(userId, tempDBResponse)
-                                                .then((response) => {
-                                                    resolve(response);
-                                                });
-
+                                            dbResponse.push(response.data.id)
                                         })
                                         .catch((error) => {
                                             reject(error);
                                         });
-                                } else if (tempDBResponse.length === 1) {
-
-                                    if (response.data.length === 1) {
-
-                                        console.log(tempDBResponse);
-                                        console.log(response.data);
-
-                                        if (tempDBResponse[0] === response.data.id) {
-
-                                            axios({
-                                                method: 'PATCH',
-                                                url: i.hook + '/' + response.data.id,
-                                                headers: {Authorization: 'token ' + token},
-                                                data: {
-                                                    name: 'web',
-                                                    active: true,
-                                                    events: settingsArray,
-                                                    config: {
-                                                        url: webhookPushUrl,
-                                                        content_type: 'json',
-                                                    } }
-                                            })
-                                                .then((response) => {
-
-                                                    console.log(response);
-                                                    resolve(response);
-
-                                                })
-                                                .catch((error) => {
-                                                    reject(error);
-                                                });
-                                        } else {
-                                            return axios({
-                                                method: 'POST',
-                                                url: i.hook,
-                                                headers: {Authorization: 'token ' + token},
-                                                data: {
-                                                    name: 'web',
-                                                    active: true,
-                                                    events: settingsArray,
-                                                    config: {
-                                                        url: webhookPushUrl,
-                                                        content_type: 'json',
-                                                    } }
-                                            })
-                                                .then((response) => {
-
-                                                    if (Array.isArray(tempDBResponse) === false) {
-                                                        tempDBResponse = [];
-                                                    }
-                                                    tempDBResponse.push(response.data.id);
-
-                                                    updateWebhookId(userId, tempDBResponse)
-                                                        .then((response) => {
-                                                            resolve(response);
-                                                        });
-
-                                                })
-                                                .catch((error) => {
-                                                    reject(error);
-                                                });
-                                        }
-                                    } else {
-
-                                        if (response.data && response.data.length <= 1) {
-
-                                            if (tempDBResponse[0] === response.data.id) {
-
-                                                axios({
-                                                    method: 'PATCH',
-                                                    url: i.hook + '/' + response.data.id,
-                                                    headers: {Authorization: 'token ' + token},
-                                                    data: {
-                                                        name: 'web',
-                                                        active: true,
-                                                        events: settingsArray,
-                                                        config: {
-                                                            url: webhookPushUrl,
-                                                            content_type: 'json',
-                                                        } }
-                                                })
-                                                    .then((response) => {
-
-                                                        console.log(response);
-                                                        resolve(response);
-
-                                                    })
-                                                    .catch((error) => {
-                                                        reject(error);
-                                                    });
-                                            } else {
-                                                return axios({
-                                                    method: 'POST',
-                                                    url: i.hook,
-                                                    headers: {Authorization: 'token ' + token},
-                                                    data: {
-                                                        name: 'web',
-                                                        active: true,
-                                                        events: settingsArray,
-                                                        config: {
-                                                            url: webhookPushUrl,
-                                                            content_type: 'json',
-                                                        } }
-                                                })
-                                                    .then((response) => {
-
-                                                        if (Array.isArray(tempDBResponse) === false) {
-                                                            tempDBResponse = [];
-                                                        }
-                                                        tempDBResponse.push(response.data.id);
-
-                                                        updateWebhookId(userId, tempDBResponse)
-                                                            .then((response) => {
-                                                                resolve(response);
-                                                            });
-
-                                                    })
-                                                    .catch((error) => {
-                                                        reject(error);
-                                                    });
-                                            }
-                                        } else {
-
-
-                                            response.data.foreach((j) => {
-
-                                                if (tempDBResponse[0] === j.id) {
-
-                                                    axios({
-                                                        method: 'PATCH',
-                                                        url: i.hook + '/' + j.id,
-                                                        headers: {Authorization: 'token ' + token},
-                                                        data: {
-                                                            name: 'web',
-                                                            active: true,
-                                                            events: settingsArray,
-                                                            config: {
-                                                                url: webhookPushUrl,
-                                                                content_type: 'json',
-                                                            } }
-                                                    })
-                                                        .then((response) => {
-
-                                                            console.log(response);
-                                                            resolve(response);
-
-                                                        })
-                                                        .catch((error) => {
-                                                            reject(error);
-                                                        });
-                                                } else {
-                                                    return axios({
-                                                        method: 'POST',
-                                                        url: i.hook,
-                                                        headers: {Authorization: 'token ' + token},
-                                                        data: {
-                                                            name: 'web',
-                                                            active: true,
-                                                            events: settingsArray,
-                                                            config: {
-                                                                url: webhookPushUrl,
-                                                                content_type: 'json',
-                                                            } }
-                                                    })
-                                                        .then((response) => {
-
-                                                            if (Array.isArray(tempDBResponse) === false) {
-                                                                tempDBResponse = [];
-                                                            }
-                                                            tempDBResponse.push(response.data.id);
-
-                                                            updateWebhookId(userId, tempDBResponse)
-                                                                .then((response) => {
-                                                                    resolve(response);
-                                                                });
-
-                                                        })
-                                                        .catch((error) => {
-                                                            reject(error);
-                                                        });
-                                                }
-                                            });
-                                        }
-                                    }
-
-                                } else {
-
-                                    console.log(tempDBResponse);
-
-                                    tempDBResponse.foreach((i) => {
-                                        response.data.foreach((j) => {
-
-                                            if (i === j.id) {
-
-                                                axios({
-                                                    method: 'PATCH',
-                                                    url: i.hook + '/' + j.id,
-                                                    headers: {Authorization: 'token ' + token},
-                                                    data: {
-                                                        name: 'web',
-                                                        active: true,
-                                                        events: settingsArray,
-                                                        config: {
-                                                            url: webhookPushUrl,
-                                                            content_type: 'json',
-                                                        } }
-                                                })
-                                                    .then((response) => {
-
-                                                        console.log(response);
-                                                        resolve(response);
-
-                                                    })
-                                                    .catch((error) => {
-                                                        reject(error);
-                                                    });
-                                            } else {
-                                                return axios({
-                                                    method: 'POST',
-                                                    url: i.hook,
-                                                    headers: {Authorization: 'token ' + token},
-                                                    data: {
-                                                        name: 'web',
-                                                        active: true,
-                                                        events: settingsArray,
-                                                        config: {
-                                                            url: webhookPushUrl,
-                                                            content_type: 'json',
-                                                        } }
-                                                })
-                                                    .then((response) => {
-
-                                                        if (Array.isArray(tempDBResponse) === false) {
-                                                            tempDBResponse = [];
-                                                        }
-                                                        tempDBResponse.push(response.data.id);
-
-                                                        updateWebhookId(userId, tempDBResponse)
-                                                            .then((response) => {
-                                                                resolve(response);
-                                                            });
-
-                                                    })
-                                                    .catch((error) => {
-                                                        reject(error);
-                                                    });
-                                            }
-                                        });
-                                    });
                                 }
 
-                            })*/
+                            }
+                        });
+                })
+                .then(() => {
+
+                    setTimeout(() => {
+                        updateWebhookId(userId, dbResponse);
+                    }, 3000);
+                    resolve();
+
+                })
+                .catch((err) => {
+                    reject(err);
+
+                });
+
+        }
+    });
+
+};

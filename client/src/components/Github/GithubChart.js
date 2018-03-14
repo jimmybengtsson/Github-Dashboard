@@ -18,6 +18,7 @@ class GithubChart extends Component {
         this.handleClick = this.handleClick.bind(this);
     }
 
+    // Handle clicks between events
     handleClick(value) {
         this.setState({
             table: value,
@@ -25,6 +26,7 @@ class GithubChart extends Component {
 
     }
 
+    // Handle clicks for dates
     checkTableChange() {
         if(this.state.table === 'Year') {
             return this.getYear();
@@ -38,6 +40,7 @@ class GithubChart extends Component {
 
     }
 
+    // Delete last data on mount
     deleteChartData() {
 
         data.labels = [];
@@ -46,6 +49,7 @@ class GithubChart extends Component {
         data.datasets[2].data = [];
     }
 
+    // Get latest weeks events
     getWeek() {
 
         this.deleteChartData();
@@ -65,6 +69,7 @@ class GithubChart extends Component {
             }
         }
 
+        // Stringify to week-days
         momentIterator(end, start).each('days', function(d) {
 
             let commitData = 0;
@@ -94,6 +99,7 @@ class GithubChart extends Component {
         });
     }
 
+    // Get latest month events
     getMonth() {
 
         this.deleteChartData();
@@ -113,6 +119,7 @@ class GithubChart extends Component {
             }
         }
 
+        // Stringify to dates
         momentIterator(end, start).each('days', function(d) {
 
             let commitData = 0;
@@ -141,6 +148,7 @@ class GithubChart extends Component {
         });
     }
 
+    // Get latest year events
     getYear() {
 
         this.deleteChartData();
@@ -160,6 +168,7 @@ class GithubChart extends Component {
             }
         }
 
+        // Stringify to months
         momentIterator(end, start).each('months', function(d) {
 
             let commitData = 0;
@@ -199,9 +208,6 @@ class GithubChart extends Component {
     }
 
     render() {
-
-        console.log(data.labels);
-
         return (
             <div className="Chart-body">
                 <Line data={data} />

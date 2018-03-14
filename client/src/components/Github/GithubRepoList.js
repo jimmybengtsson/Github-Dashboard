@@ -12,8 +12,7 @@ class GithubRepoList extends Component {
 
     constructor(props){
         super(props);
-
-        console.log(props);
+        
         this.state = {
             menuValue: 1,
             isLoaded: false,
@@ -26,10 +25,11 @@ class GithubRepoList extends Component {
         this.setState({
             menuValue: value,
         });
-        console.log(i);
+
         this.props.setRepoContent(i);
     }
 
+    // Fetch all repos for a organization from Github
     getRepos(url) {
 
         tempRepos = [];
@@ -43,16 +43,13 @@ class GithubRepoList extends Component {
                     tempRepos.push(<ListItem value={tempValue} key={i.id} primaryText={i.name} data={i} onClick={this.handleMenuChange.bind(this, i, tempValue)}/>);
                 });
             })
-            /*.then(() => {
-                this.props.setRepoContent(tempRepos[this.state.menuValue - 1].props.data.events_url);
-            })*/
             .then(() => {
                 this.setState({
                     isLoaded: true,
                 });
             })
             .catch((err) => {
-                console.log(err);
+                throw new Error(err);
             });
     }
 
@@ -65,8 +62,6 @@ class GithubRepoList extends Component {
     }
 
     render() {
-
-        console.log(this.state);
 
         return (
             <div className="List">

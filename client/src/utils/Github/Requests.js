@@ -15,9 +15,9 @@ export const getUserInfo = (token) => {
 
             resolve(response);
 
-        }).catch((error) => {
-            reject(error);
-        });
+        }).catch((err) => {
+                throw new Error(err);
+            });
     });
 };
 
@@ -32,9 +32,9 @@ export const getOrganizations = (token) => {
 
             return response.data;
 
-        }).catch((error) => {
-            console.log(error);
-        });
+        }).catch((err) => {
+                throw new Error(err);
+            });
 };
 
 export const getOrgRepos = (token, url) => {
@@ -48,9 +48,9 @@ export const getOrgRepos = (token, url) => {
 
         return response.data;
 
-    }).catch((error) => {
-        console.log(error);
-    });
+    }).catch((err) => {
+            throw new Error(err);
+        });
 };
 
 export const getRepoCommits = (token, url) => {
@@ -64,10 +64,28 @@ export const getRepoCommits = (token, url) => {
         }
     }).then((response) => {
 
-        console.log(response);
         return response.data;
 
-    }).catch((error) => {
-        console.log(error);
+    }).catch((err) => {
+        if (err.status === 409) {
+            return [];
+        }
+            console.log(err.message)
+        });
+};
+
+export const getPersonalRepos = (token, url) => {
+
+    return axios.get(url, {
+        params: {
+            access_token: token
+
+        }
+    }).then((response) => {
+
+        return response.data;
+
+    }).catch((err) => {
+        throw new Error(err);
     });
 };

@@ -1,0 +1,1 @@
+Using the Firebase CLI tool to deploy this server on Firebase Cloud Functions.

@@ -10,8 +10,6 @@ class SettingsGithub extends Component {
         super(props);
 
         this.state = {
-
-
         };
         this.setRepoUrl = this.setRepoUrl.bind(this);
     }
@@ -20,7 +18,6 @@ class SettingsGithub extends Component {
         this.setState({
             repoUrl: url,
         });
-        console.log(this.state);
     }
 
     render() {

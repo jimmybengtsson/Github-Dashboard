@@ -11,11 +11,12 @@ import MenuItem from 'material-ui/MenuItem';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import {cyan500} from 'material-ui/styles/colors';
 import Snackbar from 'material-ui/Snackbar';
+import CircularProgress from 'material-ui/CircularProgress';
 
 import Dashboard from '../Dashboard/Dashboard';
 import Github from '../Github/Github';
 import Settings from '../Settings/Settings';
-import {fetchUserData, updateUserData} from "../../utils/Firebase/Database";
+import {createWebhookIdArray, fetchUserData, updateUserData} from "../../utils/Firebase/Database";
 
 class App extends Component {
 
@@ -26,14 +27,18 @@ class App extends Component {
             menuValue: 1,
             github: false,
             openSnackBar: false,
-            snackBarMessage: ''
+            snackBarMessage: '',
+            loaded: false,
         };
         this.handleStateChange = this.handleStateChange.bind(this);
         this.closeSnackBar = this.closeSnackBar.bind(this);
+        this.handlePhilipsHue = this.handlePhilipsHue.bind(this);
     }
 
+    // Handle menu-navigation
     handleChange = (event, index, menuValue) => this.setState({menuValue});
 
+    // Handle state for authentication
     handleStateChange(value, github, firebase, token, openSB, messageSB) {
         this.setState({
 
@@ -47,6 +52,18 @@ class App extends Component {
         });
     }
 
+    // Set state for Philips Hue when adding url.
+    handlePhilipsHue(value, message) {
+        this.setState({
+
+            philipsHue: value,
+            openSnackBar: true,
+            snackBarMessage: message,
+
+        });
+    }
+
+    // Close message bar. Gets called after 4 seconds.
     closeSnackBar() {
         this.setState({
             openSnackBar: false,
@@ -54,12 +71,11 @@ class App extends Component {
         });
     };
 
+    // Check authentication and fetch data before mount.
     componentWillMount() {
         if(localStorage.getItem('userData')) {
 
             let userData = JSON.parse(localStorage.getItem('userData'));
-
-            console.log(userData);
 
             getUserInfo(userData.githubToken)
                 .then((response) => {
@@ -75,21 +91,26 @@ class App extends Component {
                 })
                 .then(() => {
 
-                    console.log(this.state);
                     let userData = {
-                        githubToken: this.state.githubToken,
                         githubName: this.state.githubData.login,
                         githubId: this.state.githubData.id,
                     };
+
                     updateUserData(this.state.user.uid, userData);
                 })
                 .then(() => {
 
                     fetchUserData(this.state.user.uid)
                         .then((response) => {
-                            if (response.val().philipsHueUrl) {
+
+                            if (response.val().philipsHueUrl.length > 0) {
                                 this.setState({
-                                    philipsHueUrl: response.val().philipsHueUrl
+                                    philipsHueUrl: response.val().philipsHueUrl,
+                                    philipsHue: true,
+                                });
+                            } else {
+                                this.setState({
+                                    philipsHue: false,
                                 });
                             }
                             if (response.val().browserNotification) {
@@ -97,10 +118,18 @@ class App extends Component {
                                     browserNotification: response.val().browserNotification
                                 });
                             }
-                        })
+                            if(!response.val().webhookId) {
+                                let webhookId = ['123', '321'];
+                                createWebhookIdArray(this.state.user.uid, webhookId);
+                            }
+                        });
+
+                    this.setState({
+                        loaded: true,
+                    });
                 })
                 .catch((error) => {
-                    console.log(error);
+                    throw new Error(error);
                 });
 
         } else {
@@ -109,6 +138,7 @@ class App extends Component {
                 user: false,
                 github: false,
                 githubToken: false,
+                loaded: true,
             });
         }
     }
@@ -117,35 +147,41 @@ class App extends Component {
     return (
         <MuiThemeProvider muiTheme={muiTheme}>
                 <Router>
-                      <div className="App">
+                    {this.state.loaded ? (
 
-                          <Toolbar>
-                              <ToolbarGroup firstChild={true}>
-                                  <DropDownMenu value={this.state.menuValue}
-                                                onChange={this.handleChange}
-                                                labelStyle={style.labelStyle}
-                                                iconStyle={style.iconStyle}
-                                                menuStyle={style.menuStyle}
-                                                menuItemStyle={style.menuItemStyle}
-                                                selectedMenuItemStyle={style.selectedMenuItemStyle}
-                                  >
-                                      <MenuItem value={1} primaryText="Dashboard" containerElement={<Link to="/" />}/>
-                                      <MenuItem value={2} primaryText="Github" containerElement={<Link to="/github" />}/>
-                                      <MenuItem value={3} primaryText="Settings" containerElement={<Link to="/settings" />}/>
-                                  </DropDownMenu>
-                              </ToolbarGroup>
-                          </Toolbar>
+                        <div className="App">
 
-                          <Route path="/" exact={true} component={() => <Dashboard state={this.state}/>} />
-                          <Route path="/github" component={() => <Github state={this.state}/>}/>
-                          <Route path="/settings" component={() => <Settings state={this.state} handleStateChange={this.handleStateChange}/>}/>
-                          <Snackbar
-                              open={this.state.openSnackBar}
-                              message={this.state.snackBarMessage}
-                              autoHideDuration={4000}
-                              onRequestClose={this.closeSnackBar}
-                          />
-                      </div>
+                            <Toolbar>
+                                <ToolbarGroup firstChild={true}>
+                                    <DropDownMenu value={this.state.menuValue}
+                                                  onChange={this.handleChange}
+                                                  labelStyle={style.labelStyle}
+                                                  iconStyle={style.iconStyle}
+                                                  menuStyle={style.menuStyle}
+                                                  menuItemStyle={style.menuItemStyle}
+                                                  selectedMenuItemStyle={style.selectedMenuItemStyle}
+                                    >
+                                        <MenuItem value={1} primaryText="Dashboard" containerElement={<Link to="/" />}/>
+                                        <MenuItem value={2} primaryText="Github" containerElement={<Link to="/github" />}/>
+                                        <MenuItem value={3} primaryText="Settings" containerElement={<Link to="/settings" />}/>
+                                    </DropDownMenu>
+                                </ToolbarGroup>
+                            </Toolbar>
+                            <Route path="/" exact={true} component={() => <Dashboard state={this.state}/>} />
+                            <Route path="/github" component={() => <Github state={this.state}/>}/>
+                            <Route path="/settings" component={() => <Settings state={this.state} handleStateChange={this.handleStateChange} handlePhilipsHue={this.handlePhilipsHue}/>}/>
+                            <Snackbar
+                                open={this.state.openSnackBar}
+                                message={this.state.snackBarMessage}
+                                autoHideDuration={4000}
+                                onRequestClose={this.closeSnackBar}
+                            />
+                        </div>
+                    ) : (
+
+                        <CircularProgress style={style.spinner}/>
+                    )}
+
                 </Router>
         </MuiThemeProvider>
 
@@ -186,6 +222,10 @@ const style = {
     },
     selectedMenuItemStyle: {
         color: cyan500,
+    },
+    spinner: {
+
+        margin: 'auto',
     }
 
 };
