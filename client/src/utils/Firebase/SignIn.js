@@ -7,22 +7,8 @@ provider.addScope('repo');
 
 export const GithubAuth = () => {
 
-        return auth.signInWithPopup(provider).then((result) => {
+    return firebase.auth().signInWithRedirect(provider);
 
-            let user = {
-                githubToken: result.credential.accessToken,
-                info: result.user,
-            };
-            console.log(user.githubToken);
-            console.log(user.info);
-
-            localStorage.setItem('userData', JSON.stringify(user));
-            return user;
-
-        })
-            .catch((err) => {
-                throw new Error(err);
-            });
 };
 
 export const SignOut = () => {
@@ -39,5 +25,29 @@ export const SignOut = () => {
                 throw new Error(err);
             });
     });
+};
+
+export const fetchGithubAuth = () => {
+
+    return auth.getRedirectResult().then((result) => {
+
+        if (result.credential) {
+
+            let user = {
+                githubToken: result.credential.accessToken,
+                info: result.user,
+            };
+            console.log(user.githubToken);
+            console.log(user.info);
+
+            localStorage.setItem('userData', JSON.stringify(user));
+            return user;
+        }
+
+    })
+        .catch((err) => {
+            throw new Error(err);
+        });
+
 };
 

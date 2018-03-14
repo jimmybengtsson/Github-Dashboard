@@ -17,6 +17,7 @@ import Dashboard from '../Dashboard/Dashboard';
 import Github from '../Github/Github';
 import Settings from '../Settings/Settings';
 import {createWebhookIdArray, fetchUserData, updateUserData} from "../../utils/Firebase/Database";
+import {fetchGithubAuth} from "../../utils/Firebase/SignIn";
 
 class App extends Component {
 
@@ -73,74 +74,77 @@ class App extends Component {
 
     // Check authentication and fetch data before mount.
     componentWillMount() {
-        if(localStorage.getItem('userData')) {
 
-            let userData = JSON.parse(localStorage.getItem('userData'));
+        fetchGithubAuth().then(() => {
+            if(localStorage.getItem('userData')) {
 
-            getUserInfo(userData.githubToken)
-                .then((response) => {
+                let userData = JSON.parse(localStorage.getItem('userData'));
 
-                    console.log(response);
-                    this.setState({
-                        githubData: response.data,
-                        github: true,
-                        user: userData.info,
-                        githubToken: userData.githubToken,
-                    });
+                getUserInfo(userData.githubToken)
+                    .then((response) => {
 
-                })
-                .then(() => {
-
-                    let userData = {
-                        githubName: this.state.githubData.login,
-                        githubId: this.state.githubData.id,
-                    };
-
-                    updateUserData(this.state.user.uid, userData);
-                })
-                .then(() => {
-
-                    fetchUserData(this.state.user.uid)
-                        .then((response) => {
-
-                            if (response.val().philipsHueUrl.length > 0) {
-                                this.setState({
-                                    philipsHueUrl: response.val().philipsHueUrl,
-                                    philipsHue: true,
-                                });
-                            } else {
-                                this.setState({
-                                    philipsHue: false,
-                                });
-                            }
-                            if (response.val().browserNotification) {
-                                this.setState({
-                                    browserNotification: response.val().browserNotification
-                                });
-                            }
-                            if(!response.val().webhookId) {
-                                let webhookId = ['123', '321'];
-                                createWebhookIdArray(this.state.user.uid, webhookId);
-                            }
+                        console.log(response);
+                        this.setState({
+                            githubData: response.data,
+                            github: true,
+                            user: userData.info,
+                            githubToken: userData.githubToken,
                         });
 
-                    this.setState({
-                        loaded: true,
-                    });
-                })
-                .catch((error) => {
-                    throw new Error(error);
-                });
+                    })
+                    .then(() => {
 
-        } else {
-            this.setState({
-                githubData: false,
-                user: false,
-                github: false,
-                githubToken: false,
-                loaded: true,
-            });
-        }
+                        let userData = {
+                            githubName: this.state.githubData.login,
+                            githubId: this.state.githubData.id,
+                        };
+
+                        updateUserData(this.state.user.uid, userData);
+                    })
+                    .then(() => {
+
+                        fetchUserData(this.state.user.uid)
+                            .then((response) => {
+
+                                if (response.val().philipsHueUrl.length > 0) {
+                                    this.setState({
+                                        philipsHueUrl: response.val().philipsHueUrl,
+                                        philipsHue: true,
+                                    });
+                                } else {
+                                    this.setState({
+                                        philipsHue: false,
+                                    });
+                                }
+                                if (response.val().browserNotification) {
+                                    this.setState({
+                                        browserNotification: response.val().browserNotification
+                                    });
+                                }
+                                if(!response.val().webhookId) {
+                                    let webhookId = ['123', '321'];
+                                    createWebhookIdArray(this.state.user.uid, webhookId);
+                                }
+                            });
+
+                        this.setState({
+                            loaded: true,
+                        });
+                    })
+                    .catch((error) => {
+                        throw new Error(error);
+                    });
+
+            } else {
+                this.setState({
+                    githubData: false,
+                    user: false,
+                    github: false,
+                    githubToken: false,
+                    loaded: true,
+                });
+            }
+        });
     }
 
     render() {
