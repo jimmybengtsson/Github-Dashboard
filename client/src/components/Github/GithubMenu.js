@@ -5,7 +5,7 @@ import MenuItem from 'material-ui/MenuItem';
 import CircularProgress from 'material-ui/CircularProgress';
 
 import './Github.css';
-import {cyan500} from "material-ui/styles/colors";
+import {cyan500, grey400, grey800} from "material-ui/styles/colors";
 
 let tempOrgs;
 
@@ -78,7 +78,10 @@ class GithubMenu extends Component {
                         value={this.state.menuValue}
                         onChange={this.handleMenuChange}
                         selectedMenuItemStyle={{
-                            color: cyan500,
+                            color: grey800,
+                        }}
+                        menuItemStyle={{
+                            color: grey400,
                         }}
                     >
                         {this.state.renderedOrgs}

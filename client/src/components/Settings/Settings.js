@@ -125,7 +125,7 @@ class Settings extends Component {
         return (
             <div className="View-body">
                 <div className="Signin-body">
-                    <Subheader>Notifications</Subheader>
+                    <Subheader style={{fontSize: '120%'}}>Notifications</Subheader>
                     <Divider />
                     <List>
                         <Subheader>Receive from:</Subheader>
@@ -145,7 +145,7 @@ class Settings extends Component {
                     <Divider />
                     <List>
                         <Subheader>Send to:</Subheader>
-                        <ListItem primaryText="Philips Hue" rightToggle={<Toggle toggled={this.state.philipsHue}
+                        <ListItem primaryText="Philips Hue" secondaryText="Add URL for server" rightToggle={<Toggle toggled={this.state.philipsHue}
                                                                                  onClick={() => this.philpsHueState()}/>} />
                         <ListItem primaryText="Browser" rightToggle={<Toggle />} />
                     </List>
@@ -172,7 +172,9 @@ class Settings extends Component {
                         onChange={this.handleTextChange}
                         id={'text-field-controlled'}
                     />
-                    {actions}
+                        <div>
+                            {actions}
+                        </div>
                     </div>
                 </Dialog>
             </div>

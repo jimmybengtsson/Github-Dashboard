@@ -3,25 +3,31 @@ let Notification = require('./Notification');
 
 exports.handlePost = (req, res, admin) => {
 
-    let topic = req.get('X-GitHub-Event');
-    let topicId = req.body.repository.id;
+    if(req.get('X-GitHub-Event') !== 'ping') {
 
-    admin.database().ref('users').equalTo(topicId.toString())
-        .once('value', (snapshot) => {
+        let topic = req.get('X-GitHub-Event');
+        let topicId = req.body.repository.id;
 
-            console.log(snapshot);
-            snapshot.forEach(function(childSnapshot) {
-                if (snapshot.val().philipsHueUrl.length > 1) {
+        let ref = admin.database().ref('users');
 
-                    console.log(childSnapshot);
-                    Notification.sendToHue(childSnapshot.val().philipsHueUrl)
+        ref.once('value').then((snapshot) => {
+
+            snapshot.forEach((i) => {
+
+                if(i.child('githubWebhooks').child(topicId.toString()).exists()) {
+
+                    if(i.child('philipsHueUrl').exists()) {
+
+                        console.log('Sent a Hue-notifications to ' + i.child('githubName').val() + ' from Github!');
+                        Notification.sendToHue(i.child('philipsHueUrl').val());
+                    }
                 }
             });
-    });
 
-    res.end();
-};
-
-exports.create = () => {
-
+        });
+        res.end();
+    } else {
+        console.log('Webhook-ping');
+        res.end();
+    }
 };

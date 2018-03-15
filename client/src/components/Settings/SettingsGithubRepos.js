@@ -9,6 +9,7 @@ import FlatButton from 'material-ui/FlatButton';
 import {fetchWebhookSettings, updateWebhookSettings} from "../../utils/Firebase/Database";
 import Snackbar from 'material-ui/Snackbar';
 import {createWebhook} from "../../utils/Github/Webhook";
+import {grey800} from "material-ui/styles/colors";
 
 
 let tempRepos;
@@ -232,7 +233,16 @@ class SettingsGithubRepos extends Component {
         return (
             <div style={styles.root}>
                 {this.state.isLoaded ? (
-                    <div>
+                    <div style={styles.root}>
+                        <div style={{marginLeft: 'auto', marginTop: -50,}}>
+                            <FlatButton
+                                label="Save"
+                                primary={true}
+                                onClick={() => this.handleSubmit()}
+                                style={styles.button}
+                                labelStyle={styles.buttonInline}
+                            />
+                        </div>
                         <GridList
                             cellHeight={'auto'}
                             style={styles.gridList}
@@ -240,13 +250,6 @@ class SettingsGithubRepos extends Component {
                         >
                             {tempRepos}
                         </GridList>
-                        <FlatButton
-                            label="Save"
-                            primary={true}
-                            onClick={() => this.handleSubmit()}
-                            style={styles.button}
-                            labelStyle={styles.buttonInline}
-                        />
                     </div>
                 ) : (
                     <CircularProgress style={styles.spinner}/>
@@ -256,6 +259,8 @@ class SettingsGithubRepos extends Component {
                     message={this.state.snackBarMessage}
                     autoHideDuration={4000}
                     onRequestClose={this.closeSnackBar}
+                    contentStyle={styles.snackBar}
+                    bodyStyle={styles.snackBar}
                 />
             </div>
 
@@ -275,15 +280,14 @@ const styles = {
         flexWrap: 'wrap',
         justifyContent: 'space-around',
         width: '100%',
-        height: '80%',
+        height: '95%',
     },
     gridList: {
         width: '100%',
-        height: '80%',
+        height: '100%',
         overflowY: 'auto',
     },
     paper: {
-        height: 180,
         width: 180,
         margin: 20,
         textAlign: 'left',
@@ -296,11 +300,14 @@ const styles = {
         color: '#636363',
     },
     button: {
-        float: 'right',
         marginRight: 10,
     },
     buttonInline: {
 
         fontSize: '120%',
+    },
+    snackBar: {
+        backgroundColor: grey800,
+        textAlign: 'center'
     }
 };

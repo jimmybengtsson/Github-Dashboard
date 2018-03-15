@@ -9,7 +9,7 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import {Toolbar, ToolbarGroup} from 'material-ui/Toolbar';
 import MenuItem from 'material-ui/MenuItem';
 import DropDownMenu from 'material-ui/DropDownMenu';
-import {cyan500, grey800} from 'material-ui/styles/colors';
+import {cyan500, grey800, grey400} from 'material-ui/styles/colors';
 import Snackbar from 'material-ui/Snackbar';
 import CircularProgress from 'material-ui/CircularProgress';
 
@@ -151,6 +151,8 @@ class App extends Component {
     return (
         <MuiThemeProvider muiTheme={muiTheme}>
                 <Router>
+
+                    <div className="App">
                     {this.state.loaded ? (
 
                         <div className="App">
@@ -179,6 +181,8 @@ class App extends Component {
                                 message={this.state.snackBarMessage}
                                 autoHideDuration={4000}
                                 onRequestClose={this.closeSnackBar}
+                                contentStyle={style.snackBar}
+                                bodyStyle={style.snackBar}
                             />
                         </div>
                     ) : (
@@ -186,6 +190,7 @@ class App extends Component {
                         <CircularProgress style={style.spinner}/>
                     )}
 
+                    </div>
                 </Router>
         </MuiThemeProvider>
 
@@ -223,13 +228,18 @@ const style = {
         fontSize: 20,
         marginTop: 10,
         marginBottom: 10,
+        color: grey400,
     },
     selectedMenuItemStyle: {
-        color: cyan500,
+        color: grey800,
     },
     spinner: {
 
         margin: 'auto',
+    },
+    snackBar: {
+        backgroundColor: grey800,
+        textAlign: 'center',
     }
 
 };

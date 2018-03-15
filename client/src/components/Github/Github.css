@@ -46,13 +46,13 @@
 }
 
 .Content-graph {
-    width: 70%;
+    width: 78%;
     height: 100%;
 }
 
 .Content-events {
-    width: 30%;
-    height: 80%;
+    width: 22%;
+    height: 90%;
     border-left: 1px solid #cbced0;
     text-align: left;
     overflow: auto;
@@ -61,7 +61,8 @@
 .Event {
 
     text-align: left;
-    margin: 2px;
+    margin: 2px 2px 10px 2px;
+
 }
 
 
@@ -81,6 +82,7 @@
 .List {
     width: 100%;
     height: 70%;
+    overflow: auto;
 }
 
 @media only screen and (max-width: 600px) {
