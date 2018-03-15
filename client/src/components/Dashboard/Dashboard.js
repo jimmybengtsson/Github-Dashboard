@@ -2,7 +2,10 @@ import React, { Component } from 'react';
 import './Dashboard.css';
 import {getPersonalRepos, getRepoCommits} from "../../utils/Github/Requests";
 import CircularProgress from 'material-ui/CircularProgress';
-let eventArray;
+import DropDownMenu from 'material-ui/DropDownMenu';
+import MenuItem from 'material-ui/MenuItem';
+import {grey400, grey800} from "material-ui/styles/colors";
+let repoArray;
 
 
 class Dashboard extends Component {
@@ -14,81 +17,48 @@ class Dashboard extends Component {
             githubRepo: '',
             githubData: this.props.state.githubData,
             githubToken: this.props.state.githubToken,
-            loaded: true
+            loaded: false,
+            repoUrl: 'https://api.github.com/user/repos',
+            renderedRepos: [],
+            menuValue: 2,
         };
+        this.handleMenuChange = this.handleMenuChange.bind(this);
     }
 
-    setRepoUrl(url) {
+    handleMenuChange(event, index, value) {
         this.setState({
-            repoUrl: url,
+            menuValue: value,
         });
     }
 
-   /* componentDidMount() {
+   componentDidMount() {
 
-        eventArray = [];
         if (this.props.state.github) {
 
-            getPersonalRepos(this.props.state.githubToken, 'https://api.github.com/user/repos')
+            repoArray = [];
+            getPersonalRepos(this.props.state.githubToken, this.state.repoUrl)
                 .then((response) => {
+                    let tempValue = 0;
 
+                    console.log(response);
+                    repoArray = response;
                     response.forEach((i) => {
-                        getRepoCommits(this.props.state.githubToken, i.commits_url)
-                            .then((responseCommits) => {
-                                console.log(responseCommits);
-                                if (responseCommits !== null && Array.isArray(responseCommits) && responseCommits.length >= 0) {
 
-                                    for (let j = 0; j < responseCommits.length; j++) {
-
-                                        if(j === null) {
-                                            return;
-                                        } else {
-                                            eventArray.push({event: 'Commit', date: j.commit.committer.date});
-                                        }
-                                    }
-
-                                }
-
-                                getRepoCommits(this.props.state.githubToken, i.issues_url)
-                                    .then((responseIssues) => {
-                                        console.log(responseIssues);
-                                        if (Array.isArray(responseIssues) && responseIssues.length >= 0) {
-
-
-                                            for (let j = 0; j < responseIssues.length; j++) {
-
-                                                eventArray.push({event: 'Issue', date: j.created_at});
-                                            }
-
-                                        }
-
-                                        getRepoCommits(this.props.state.githubToken, i.releases_url)
-                                            .then((responseReleases) => {
-
-                                                console.log(responseReleases);
-                                                if (Array.isArray(responseReleases) && responseReleases.length >= 0) {
-                                                for (let j = 0; j < responseReleases.length; j++) {
-
-
-                                                        eventArray.push({event: 'Release', date: j.published_at});
-                                                    }
-
-                                                }
-                                            })
-
-                                    })
-                            })
+                        tempValue = tempValue + 1;
+                        this.state.renderedRepos.push(<MenuItem value={tempValue} key={i.id} primaryText={i.name} data={i}/>);
                     })
+
                 })
                 .then(() => {
-                    console.log(eventArray);
                     this.setState({
                         loaded: true,
                     });
-
                 })
+                .catch((err) => {
+                    throw new Error(err);
+                });
         }
-    }*/
+    }
 
     render() {
 
@@ -97,12 +67,30 @@ class Dashboard extends Component {
         return (
             <div className="View-body">
                 {githubLoggedIn ?  (
-                    <div>
-                        {this.state.loaded ?  (
-                            <p>Dashboard</p>
-                        ) : (
-                            <CircularProgress style={style.spinner}/>
-                        )}
+                    <div className="Github-body">
+                            {this.state.loaded ?  (
+                                <DropDownMenu
+                                    value={this.state.menuValue}
+                                    onChange={this.handleMenuChange}
+                                    selectedMenuItemStyle={{
+                                        color: grey800,
+                                    }}
+                                    menuItemStyle={{
+                                        color: grey400,
+                                    }}
+                                >
+                                    {this.state.renderedRepos}
+                                </DropDownMenu>
+                            ) : (
+                                <CircularProgress style={style.spinner}/>
+                            )}
+                        <div className="Content-body">
+                            {this.state.repoContent ? (
+                                <p>Github Chart</p>
+                            ) : (
+                                <p className="message">Click on repository to view events!</p>
+                            )}
+                        </div>
                     </div>
                             ) : (
                     <div className="message">

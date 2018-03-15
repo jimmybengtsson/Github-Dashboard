@@ -9,12 +9,12 @@
 .Settings-body {
     width: 80%;
     height: 100%;
-    text-align: left;
 }
 
 .Github-settings-body {
     width: 100%;
     height: 100%;
+    text-align: left;
 }
 
 .Repo-settings {
@@ -49,8 +49,9 @@
 }
 
 .message {
-    margin: auto;
+
     color: #737373;
+    margin-top: 30%;
 }
 
 @media only screen and (max-width: 600px) {

@@ -76,6 +76,6 @@ export default Github;
 const style = {
     spinner: {
 
-        margin: 'auto',
+        marginTop: '30%',
     }
 };
